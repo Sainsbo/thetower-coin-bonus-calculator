@@ -68,8 +68,9 @@ class BlackHole(Base):
         self.cooldown = cooldown
         self.size = size
         self.quantity = quantity
-        self.bonus = self.coverage_fraction(self.tower_range, self.size, 
-                                       self.quantity) * self.coin_bonus
+        self.coverage = self.coverage_fraction(self.tower_range, self.size, 
+                                       self.quantity)
+        self.bonus = self.coverage * self.coin_bonus
         
     @staticmethod
     def coverage_fraction(tower_range, bh_size, bh_quant, 
@@ -113,7 +114,8 @@ class GoldBot(Base):
         self.duration= duration
         self.cooldown = cooldown
         self.size = size
-        self.bonus = self.gold_bot_coverage(tower_range, size) * self.coin_bonus
+        self.coverage = self.gold_bot_coverage(tower_range, size)
+        self.bonus = self.coverage * self.coin_bonus
         
     @staticmethod
     def gold_bot_coverage(m, n, samples=2_000_000, seed=0):
@@ -225,6 +227,9 @@ class TotalCoin:
         GoldBotBonus = GoldBot(self.tower_range, self.gb_coin_bonus, 
                                self.gb_duration, self.gb_cooldown, 
                                self.gb_size)
+        
+        gb_cover = GoldBotBonus.coverage
+        bh_cover = BlackHoleBonus.coverage
             
         instant_bonus = []
         for i in np.arange(0,100000,0.5):
@@ -242,16 +247,13 @@ class TotalCoin:
                     dw_bonus *
                     gb_bonus)
             
-        fig, axs = plt.subplots(1, 2, figsize = [12,6])
-        axs[0].plot(np.arange(0,300,0.5), instant_bonus[0:600])
-        axs[0].set_xlabel('time (seconds)')
-        axs[0].set_ylabel('Total coin bonus')
-        axs[1].plot(np.arange(0,3000,0.5), instant_bonus[0:6000])
-        axs[1].set_xlabel('time (seconds)')
-        axs[1].set_ylabel('Total coin bonus')
-        plt.suptitle(f'mean across simulation = {np.mean(instant_bonus):.1f} \n {title}')
+        fig, axs = plt.subplots(figsize = [6,6])
+        axs.plot(np.arange(0,300,0.5), instant_bonus[0:600])
+        axs.set_xlabel('time (seconds)')
+        axs.set_ylabel('Total coin bonus')
+        plt.suptitle('Coin bonus per second')
                 
-        return fig, np.mean(instant_bonus)
+        return fig, np.mean(instant_bonus), gb_cover, bh_cover
     
 st.title("Coin Bonus Calculator")
 
@@ -285,8 +287,8 @@ with st.sidebar:
     
 if st.button("Run simulation"):
     obj = TotalCoin(**values)
-    fig, mean_bonus = obj.mc_estimator("Simulation results")
+    fig, mean_bonus, gb_cover, bh_cover = obj.mc_estimator("Simulation results")
     st.pyplot(fig)
     st.metric("Average coin bonus", f"{mean_bonus:.1f}")
-
-
+    st.metric("GB coverage", f"{gb_cover*100.0:.1f}%")
+    st.metric("BH coverage", f"{bh_cover*100.0:.1f}%")
