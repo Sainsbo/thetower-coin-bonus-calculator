@@ -15,8 +15,6 @@ Created on Sun Dec 28 13:16:44 2025
 import numpy as np
 import streamlit as st
 import matplotlib.pyplot as plt
-import seaborn as sns
-sns.set()
 
 class Base:
     
@@ -297,3 +295,4 @@ if st.button("Run simulation"):
     fig, mean_bonus = obj.mc_estimator("Simulation results")
     st.pyplot(fig)
     st.metric("Average coin bonus", f"{mean_bonus:.1f}")
+
