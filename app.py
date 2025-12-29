@@ -269,7 +269,7 @@ with st.sidebar:
         bh_duration = st.number_input("BH duration", 0.0, 200.0, 37.0),
         bh_cooldown = st.number_input("BH cooldown", 0.0, 500.0, 160.0),
         bh_size = st.number_input("BH size", 0.0, 150.0, 52.0),
-        bh_quantity = st.number_input("BH quantity", 0.0, 3, 3, step = 1),
+        bh_quantity = st.number_input("BH quantity", 0, 3, 3, step = 1),
         gt_coin_bonus = st.number_input("GT coin bonus", 0.0, 50.0, 24.8),
         gt_duration = st.number_input("GT duration", 0.0, 200.0, 45.0),
         gt_cooldown = st.number_input("GT cooldown", 0.0, 500.0, 160.0),
@@ -288,4 +288,5 @@ if st.button("Run simulation"):
     fig, mean_bonus = obj.mc_estimator("Simulation results")
     st.pyplot(fig)
     st.metric("Average coin bonus", f"{mean_bonus:.1f}")
+
 
